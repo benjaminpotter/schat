@@ -1,6 +1,6 @@
 use std::error::Error;
 use tokio;
-use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync;
 
@@ -54,7 +54,9 @@ impl Server {
                         tokio::spawn(async move {
                             loop {
                                 match rx.recv().await {
-                                    Ok(message) => println!("chat: {}", message),
+                                    Ok(message) => {
+                                        writer.write(message.as_bytes()).await;
+                                    }
                                     Err(e) => eprintln!("failed to recv broadcast {}", e),
                                 }
                             }
